@@ -1,6 +1,6 @@
 elasticsearch = require 'elasticsearch'
 
-client = new elasticsearch.Client host: process.env.ELASTICSEARCH_HOST
+client = new elasticsearch.Client host: process.env.ELASTICSEARCH_HOST#, log: 'trace'
 
 class Storage
   save: (data) ->

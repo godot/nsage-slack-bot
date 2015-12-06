@@ -7,38 +7,46 @@ class LogCommand
 
 exports.log = LogCommand
 
-
 class SearchCommand
-  constructor: () ->
+  respondToRequester: true
+
+  constructor: (@query) ->
     @storage = new Storage()
 
-  execute: (query, cb, err) ->
-    @storage.search query, cb
+  execute: (cb, err) ->
+    @storage.search @query, cb
 
+exports.SearchCommand = SearchCommand
 
 class CommandBuilder
   @commands = {
-    q : new SearchCommand()
+    q : SearchCommand
   }
 
   constructor: (options) ->
     @text = options.text
+    @bot  = options.bot
+    @parseText()
 
-    @commandRegExp = new RegExp("<@"+options.bot+">: ([q]) (.*)")
+  commandRegExp: () ->
+    new RegExp("<@"+@bot+">: ([q]) (.*)")
 
-    if cmd = @isCommand()
-      @commandName = cmd[1]
-      @params = cmd[2]
+  parseText: () ->
+    args = @text.match(@commandRegExp())
+    if args?
+      @commandName = args[1]
+      @params = args[2]
 
   isCommand: ->
-    @text && @text.match(@commandRegExp)
+    @text && @commandName
 
   command: ->
-    CommandBuilder.commands[@commandName]
-
-  execute: (callback,error) ->
     return unless @isCommand()
 
-    @command().execute @params, callback
+    new CommandBuilder.commands[@commandName](@params)
 
-exports.Builder = CommandBuilder
+
+exports.createCommand = (options) ->
+  new CommandBuilder(options).command()
+
+exports.CommandBuilder = CommandBuilder

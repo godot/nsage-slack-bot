@@ -1,15 +1,12 @@
 require('dotenv').load()
 
+redux = require 'redux'
 Slack = require 'slack-client'
 commands = require './src/commands'
 
-log = new commands.log()
+logCommand = new commands.log()
 
-slackToken = process.env.SLACK_TOKEN
-autoReconnect = true
-autoMark = true
-
-slack = new Slack(slackToken, autoReconnect, autoMark)
+slack = new Slack(process.env.SLACK_TOKEN, autoReconnect = true, autoMark = true)
 
 slack.on 'open', ->
   console.log "Connected to #{slack.team.name} as @#{slack.self.name}"
@@ -18,27 +15,38 @@ slack.on 'error', (err) ->
   console.error "Error", err
 
 slack.on 'message', (message) ->
-  channel = slack.getChannelGroupOrDMByID(message.channel)
-  user = slack.getUserByID(message.user)
+  msg = MessageDecorator(message)
 
-  console.log 'message:', message
-  console.log 'channel:', channel
-
-  if channel? && user? && message?
-    commandOptions = {
+  if message?
+    options = {
       text: message.text,
-      channel: channel.name,
-      user: user.name,
+      channel: message.channelName,
+      user: message.userName,
       ts: message.ts,
       bot: slack.self.id
     }
 
-    command = new commands.Builder(commandOptions)
+    command = commands.createCommand(options)
 
-    command.execute (res) ->
-      channel.send res
+    if command?
+      command.execute (res) ->
+        if command.respondToRequester
+          slack.getDMByName(message.userName).send res
+        else
+          slack.getChannelByID(message.channel).send res
 
-    log.execute(commandOptions)
+    logCommand.execute(options)
 
+sendResponse = (receipient, response) ->
+  console.log receipient
+  slack.getChannelGroupOrDMByID(receipient).send(response)
+
+
+MessageDecorator = (msg) ->
+  if msg.user?
+    msg.userName = slack.getUserByID(msg.user).name
+  if msg.channel?
+    msg.channelName =  slack.getChannelGroupOrDMByID(msg.channel).name
+  msg
 
 slack.login()
