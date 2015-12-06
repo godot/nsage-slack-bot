@@ -1,10 +1,9 @@
 require('dotenv').load()
 
-redux = require 'redux'
 Slack = require 'slack-client'
 commands = require './src/commands'
 
-logCommand = new commands.log()
+logCommand = new commands.LogCommand()
 
 slack = new Slack(process.env.SLACK_TOKEN, autoReconnect = true, autoMark = true)
 
@@ -15,7 +14,7 @@ slack.on 'error', (err) ->
   console.error "Error", err
 
 slack.on 'message', (message) ->
-  msg = MessageDecorator(message)
+  message = MessageDecorator(message)
 
   if message?
     options = {
@@ -35,11 +34,8 @@ slack.on 'message', (message) ->
         else
           slack.getChannelByID(message.channel).send res
 
+    #log everything
     logCommand.execute(options)
-
-sendResponse = (receipient, response) ->
-  console.log receipient
-  slack.getChannelGroupOrDMByID(receipient).send(response)
 
 
 MessageDecorator = (msg) ->

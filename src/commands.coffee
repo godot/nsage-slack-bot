@@ -5,7 +5,7 @@ class LogCommand
     storage = new Storage()
     storage.save options
 
-exports.log = LogCommand
+exports.LogCommand = LogCommand
 
 class SearchCommand
   respondToRequester: true
