@@ -13,7 +13,7 @@ class JokeCommand
       cb(JSON.parse(data).value.joke)
 
   url: () ->
-    URL.replace('<FIRSTNAME>',@firstName).replace('<LASTNAME>', @lastName)
+    URL.replace('<FIRSTNAME>',@firstName).replace('<LASTNAME>', (@lastName || "Jr."))
 
 
 module.exports = JokeCommand

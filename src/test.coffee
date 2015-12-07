@@ -9,6 +9,13 @@ exports.testJokeCommand = (test) ->
   test.ok commands.CommandBuilder.commands.joke
   test.done()
 
+exports.testRequestJokeCommandWithFirstNameOnly = (test) ->
+  cb = commands.createCommand({bot: 'U0F57MJR5', text: "<@U0F57MJR5>: joke fir"})
+  cb.execute (data) ->
+    console.log data
+    test.ok data
+    test.ok !data.match(new RegExp("undefined"))
+    test.done()
 
 exports.testRequestJokeCommand = (test) ->
   cb = commands.createCommand({bot: 'U0F57MJR5', text: "<@U0F57MJR5>: joke fir lat"})
@@ -16,7 +23,6 @@ exports.testRequestJokeCommand = (test) ->
     console.log data
     test.ok data
     test.done()
-
 
 exports.testRequestSearchCommand = (test) ->
   cb = commands.createCommand({bot: 'U0F57MJR5', text: "<@U0F57MJR5>: q test"})
