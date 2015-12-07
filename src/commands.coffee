@@ -38,11 +38,11 @@ class CommandBuilder
       @params = args[2]
 
   isCommand: ->
-    @text && @commandName
+    @text? && @commandName?
 
   command: ->
     return unless @isCommand()
-
+    console.log 'executing:', @commandName, " with ", @params
     new CommandBuilder.commands[@commandName](@params)
 
 
