@@ -1,4 +1,7 @@
 Storage = require './store'
+JokeCommand = require './jokes'
+
+exports.JokeCommand = JokeCommand
 
 class LogCommand
   execute: (options) ->
@@ -20,7 +23,8 @@ exports.SearchCommand = SearchCommand
 
 class CommandBuilder
   @commands = {
-    q : SearchCommand
+    q : SearchCommand,
+    joke: JokeCommand
   }
 
   constructor: (options) ->
@@ -29,7 +33,7 @@ class CommandBuilder
     @parseText()
 
   commandRegExp: () ->
-    new RegExp("<@"+@bot+">: ([q]) (.*)")
+    new RegExp("<@"+@bot+">: (q|joke) (.+)")
 
   parseText: () ->
     args = @text.match(@commandRegExp())

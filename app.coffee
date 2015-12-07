@@ -7,6 +7,15 @@ logCommand = new commands.LogCommand()
 
 slack = new Slack(process.env.SLACK_TOKEN, autoReconnect = true, autoMark = true)
 
+slack.on 'presenceChange', (user) ->
+  return if user.is_bot
+  return if user.presence == 'active'
+
+  joke = new commands.JokeCommand(user.profile.real_name)
+
+  joke.execute (data) ->
+    slack.getGroupByName('350px').send data
+
 slack.on 'open', ->
   console.log "Connected to #{slack.team.name} as @#{slack.self.name}"
 
@@ -29,10 +38,14 @@ slack.on 'message', (message) ->
 
     if command?
       command.execute (res) ->
-        if command.respondToRequester
-          slack.getDMByName(message.userName).send res
-        else
-          slack.getChannelByID(message.channel).send res
+        try
+          if command.respondToRequester
+            slack.getDMByName(message.userName).send res
+          else
+            slack.getChannelGroupOrDMByID(message.channel).send res
+        catch error
+          console.log "Error:" + error
+
 
     #log everything
     logCommand.execute(options)
