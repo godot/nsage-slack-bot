@@ -30,7 +30,15 @@ and edit
 
 ## usage ##
 
+searching:
+
 ```
 @botname: q query
 ```
 will return saved messages matching the query
+
+### jokes ###
+
+```
+@botname: joke firstname lastname
+```
