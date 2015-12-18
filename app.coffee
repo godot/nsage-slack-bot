@@ -2,6 +2,7 @@ require('dotenv').load()
 
 Slack = require 'slack-client'
 commands = require './src/commands'
+watchr = require 'watchr'
 
 logCommand = new commands.LogCommand()
 
@@ -18,6 +19,13 @@ slack.on 'presenceChange', (user) ->
 
 slack.on 'open', ->
   console.log "Connected to #{slack.team.name} as @#{slack.self.name}"
+
+  watchr.watch
+    paths: ['./rpimages']
+    listeners:
+      change: (changeType, filePath, fileCurrentStat, filePreviousStat) ->
+        slack.getGroupByName('bot-tests').send JSON.stringify([arguments[0],arguments[1]])
+
 
 slack.on 'error', (err) ->
   console.error "Error", err
@@ -45,7 +53,6 @@ slack.on 'message', (message) ->
             slack.getChannelGroupOrDMByID(message.channel).send res
         catch error
           console.log "Error:" + error
-
 
     #log everything
     logCommand.execute(options)
