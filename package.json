@@ -12,6 +12,7 @@
     "dotenv": "^1.2.0",
     "elasticsearch": "^10.0.1",
     "lodash": "^3.10.1",
+    "parse-push": "0.0.3",
     "redux": "^3.0.4",
     "request": "^2.67.0",
     "slack-client": "^1.4.1",
