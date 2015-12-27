@@ -20,6 +20,9 @@ slack.on 'presenceChange', (user) ->
 slack.on 'open', ->
   console.log "Connected to #{slack.team.name} as @#{slack.self.name}"
 
+slack.on 'open', ->
+  console.log "watchr callback init"
+
   watchr.watch
     paths: ['./rpimages']
     listeners:

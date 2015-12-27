@@ -30,16 +30,17 @@ class CommandBuilder
   constructor: (options) ->
     @text = options.text
     @bot  = options.bot
-    @parseText()
+    try
+      @parseText()
+    catch error
+      console.log "Error:" + error
+      console.log options
 
   commandRegExp: () ->
     new RegExp("<@"+@bot+">: (q|joke) (.+)")
 
   parseText: () ->
-    args = @text.match(@commandRegExp())
-    if args?
-      @commandName = args[1]
-      @params = args[2]
+    [_, @commandName, @params] = @text.match(@commandRegExp()) || []
 
   isCommand: ->
     @text? && @commandName?
